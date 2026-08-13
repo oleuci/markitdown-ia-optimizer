@@ -8,6 +8,14 @@ no numeric value is silently lost along the way.
 > This project adds the layer *around* it: cleanup, token optimization, a fidelity guardrail,
 > multi-user auth, and a turnkey deployment.
 
+## Screenshot
+
+![MarkItDown IA Optimizer — conversion and token optimization with a fidelity control](docs/screenshot.png)
+
+*Real example: a public audit report (French Cour des comptes). Converted (conversion fidelity 57/57),
+then compacted by −34% while keeping all 52/52 numeric values. Fidelity is verified at conversion and
+at each optimization level.*
+
 ## Features
 
 - **Convert many formats → Markdown**: MarkItDown (native), **LibreOffice headless**
