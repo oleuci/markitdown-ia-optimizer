@@ -1,5 +1,7 @@
 # MarkItDown IA Optimizer
 
+**English** · [Français](README.fr.md)
+
 Self-hosted web app that converts documents (PDF, Office, ODT, images…) to **Markdown**,
 then **optimizes them for LLMs** — with a deterministic **fidelity control** that guarantees
 no numeric value is silently lost along the way.
