@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Vérification 2FA{% endblock %}
+{% block content %}
+<div class="card card-narrow">
+  <h1>Double authentification</h1>
+  <p class="muted">Saisissez le code à 6 chiffres de votre application d'authentification.</p>
+  <form method="post" action="/2fa" autocomplete="off">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Code
+      <input name="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" required autofocus
+             autocomplete="one-time-code">
+    </label>
+    <button type="submit">Valider</button>
+  </form>
+  <p class="muted small"><a href="/logout">Annuler</a></p>
+</div>
+{% endblock %}

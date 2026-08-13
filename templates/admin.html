@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Administration{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Administration</h1>
+
+  <section class="admin-section">
+    <h2>Politique de sécurité</h2>
+    <form method="post" action="/admin/enforce2fa" class="inline-form">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      {% if enforce_2fa %}
+        <span class="badge badge-ok">2FA obligatoire : activée</span>
+        <input type="hidden" name="value" value="0">
+        <button type="submit" class="btn-ghost">Désactiver l'obligation</button>
+      {% else %}
+        <span class="badge badge-warn">2FA obligatoire : désactivée</span>
+        <input type="hidden" name="value" value="1">
+        <button type="submit">Imposer la 2FA à tous</button>
+      {% endif %}
+    </form>
+    <p class="muted small">Si activée, chaque utilisateur devra configurer sa 2FA à sa prochaine connexion.</p>
+  </section>
+
+  <section class="admin-section">
+    <h2>Créer un utilisateur</h2>
+    <form method="post" action="/admin/users/create" class="inline-form" autocomplete="off">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <input name="username" placeholder="identifiant" required pattern="[A-Za-z0-9._-]{3,32}">
+      <select name="role">
+        <option value="user">Utilisateur</option>
+        <option value="admin">Administrateur</option>
+      </select>
+      <button type="submit">Créer</button>
+    </form>
+    <p class="muted small">Un mot de passe provisoire est généré ; l'utilisateur devra le changer.</p>
+  </section>
+
+  <section class="admin-section">
+    <h2>Utilisateurs</h2>
+    <table class="tbl">
+      <thead>
+        <tr><th>ID</th><th>Identifiant</th><th>Rôle</th><th>État</th><th>2FA</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+      {% for u in users %}
+        <tr>
+          <td>{{ u.id }}</td>
+          <td>{{ u.username }}</td>
+          <td>{{ u.role }}</td>
+          <td>{% if u.active %}<span class="badge badge-ok">actif</span>{% else %}<span class="badge badge-warn">désactivé</span>{% endif %}</td>
+          <td>{% if u.totp_enabled %}✅{% else %}—{% endif %}</td>
+          <td class="actions">
+            <form method="post" action="/admin/users/{{ u.id }}/reset"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn-ghost" type="submit">Réinit. MDP</button></form>
+            <form method="post" action="/admin/users/{{ u.id }}/reset2fa"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn-ghost" type="submit">Réinit. 2FA</button></form>
+            <form method="post" action="/admin/users/{{ u.id }}/toggle"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn-ghost" type="submit">{% if u.active %}Désactiver{% else %}Activer{% endif %}</button></form>
+            <form method="post" action="/admin/users/{{ u.id }}/delete" data-confirm="Supprimer {{ u.username }} ?"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn-danger" type="submit">Suppr.</button></form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/admin.js?v={{ asset_ver }}"></script>
+{% endblock %}

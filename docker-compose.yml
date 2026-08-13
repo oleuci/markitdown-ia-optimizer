@@ -1,0 +1,15 @@
+# MarkItDown IA Optimizer — minimal Compose.
+# IMPORTANT: put this behind a TLS reverse proxy (Caddy, Traefik, Nginx Proxy Manager…).
+# Do NOT expose port 8080 directly on the Internet.
+
+services:
+  app:
+    build: .
+    # or use a prebuilt image:  image: your-registry/markitdown-ia-optimizer:latest
+    env_file:
+      - secret.env
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "127.0.0.1:8080:8080"   # bind to localhost; let your reverse proxy expose it
+    restart: unless-stopped

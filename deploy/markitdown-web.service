@@ -1,0 +1,35 @@
+[Unit]
+Description=MarkItDown IA Optimizer (FastAPI)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mdweb
+Group=mdweb
+WorkingDirectory=/opt/markitdown
+EnvironmentFile=/opt/markitdown/secret.env
+# FORWARDED_ALLOW_IPS is read from secret.env (set it to your reverse-proxy IP)
+ExecStart=/opt/markitdown/venv/bin/uvicorn app:app --host 0.0.0.0 --port 8080 --proxy-headers --forwarded-allow-ips=${FORWARDED_ALLOW_IPS}
+Restart=on-failure
+RestartSec=3
+
+# --- Hardening ---
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/markitdown/data
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictRealtime=true
+MemoryMax=3072M
+CPUQuota=180%
+TasksMax=200
+
+[Install]
+WantedBy=multi-user.target

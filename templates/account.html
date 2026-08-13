@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Mon compte{% endblock %}
+{% block content %}
+<div class="card card-narrow">
+  <h1>Mon compte</h1>
+  <p class="muted">Connecté en tant que <strong>{{ user.username }}</strong> ({{ user.role }}).</p>
+
+  {% if force_pw %}
+    <div class="flash flash-info">Vous devez définir un nouveau mot de passe avant de continuer.</div>
+  {% endif %}
+
+  <h2>Mot de passe</h2>
+  <form method="post" action="/account/password" autocomplete="off">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    {% if not force_pw %}
+    <label>Mot de passe actuel
+      <input name="current" type="password" required autocomplete="current-password">
+    </label>
+    {% endif %}
+    <label>Nouveau mot de passe (10 caractères min.)
+      <input id="new1" name="new1" type="password" required minlength="10" autocomplete="new-password">
+    </label>
+    <label>Confirmer
+      <input id="new2" name="new2" type="password" required minlength="10" autocomplete="new-password">
+    </label>
+    <div class="genrow">
+      <button type="button" id="genpw" class="btn-ghost">Générer un mot de passe fort</button>
+      <label class="showpw"><input type="checkbox" id="showpw"> Afficher</label>
+    </div>
+    <p id="genout" class="genout" hidden>Mot de passe généré : <code id="genval"></code>
+      <button type="button" id="gencopy" class="btn-ghost">Copier</button>
+      <span class="muted small">— notez-le avant d'enregistrer.</span></p>
+    <button type="submit">Mettre à jour</button>
+  </form>
+
+  {% if not force_pw %}
+  <h2>Double authentification (2FA)</h2>
+  {% if user.totp_enabled %}
+    <p class="badge badge-ok">Activée ✅</p>
+    {% if enforce_2fa %}
+      <p class="muted small">Imposée par l'administrateur — désactivation impossible.</p>
+    {% else %}
+      <form method="post" action="/2fa/disable">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <button type="submit" class="btn-danger">Désactiver la 2FA</button>
+      </form>
+    {% endif %}
+  {% else %}
+    <p class="badge badge-warn">Désactivée</p>
+    <a class="btn" href="/2fa/setup">Activer la 2FA</a>
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/account.js?v={{ asset_ver }}"></script>
+{% endblock %}

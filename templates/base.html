@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf }}">
+  <title>{% block title %}{{ app_title }}{% endblock %} · {{ app_title }}</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ asset_ver }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png?v={{ asset_ver }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16.png?v={{ asset_ver }}">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png?v={{ asset_ver }}">
+  <link rel="stylesheet" href="/static/style.css?v={{ asset_ver }}">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/">▾ {{ app_title }}</a>
+  <nav>
+    {% if user %}
+      <a href="/">Convertir</a>
+      <a href="/account">Compte</a>
+      {% if user.role == 'admin' %}<a href="/admin">Administration</a>{% endif %}
+      <span class="whoami">{{ user.username }}</span>
+      <a class="btn-ghost" href="/logout">Déconnexion</a>
+    {% endif %}
+  </nav>
+</header>
+
+<main class="wrap">
+  {% for f in flashes %}
+    <div class="flash flash-{{ f.kind }}">{{ f.msg }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="foot">
+  <span>MarkItDown Web · auto-hébergé</span>
+</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

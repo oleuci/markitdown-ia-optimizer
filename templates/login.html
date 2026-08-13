@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Connexion{% endblock %}
+{% block content %}
+<div class="card card-narrow">
+  <h1>Connexion</h1>
+  <form method="post" action="/login" autocomplete="off">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Identifiant
+      <input name="username" required autofocus autocomplete="username">
+    </label>
+    <label>Mot de passe
+      <input name="password" type="password" required autocomplete="current-password">
+    </label>
+    <button type="submit">Se connecter</button>
+  </form>
+</div>
+{% endblock %}

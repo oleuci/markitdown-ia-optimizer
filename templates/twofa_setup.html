@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Activer la 2FA{% endblock %}
+{% block content %}
+<div class="card card-narrow">
+  <h1>Activer la double authentification</h1>
+  {% if forced %}
+    <div class="flash flash-info">La double authentification est <strong>obligatoire</strong>. Activez-la pour continuer.</div>
+  {% endif %}
+  <ol class="steps">
+    <li>Scannez ce QR code avec Google Authenticator, Aegis, FreeOTP…</li>
+    <li>Ou saisissez la clé manuellement : <code class="secret">{{ secret }}</code></li>
+    <li>Entrez le code à 6 chiffres généré pour confirmer.</li>
+  </ol>
+  <div class="qr"><img src="{{ qr_data }}" alt="QR code 2FA" width="200" height="200"></div>
+  <form method="post" action="/2fa/setup" autocomplete="off">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Code de confirmation
+      <input name="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" required
+             autocomplete="one-time-code">
+    </label>
+    <button type="submit">Activer</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Convertir{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Fichiers → Markdown</h1>
+  <p class="muted">Glissez vos fichiers ou cliquez pour les choisir. La conversion se fait
+    sur ce serveur ; les fichiers sont supprimés juste après. Taille max : {{ max_mb }} Mo par fichier.</p>
+
+  <details class="help">
+    <summary>❓ Aide — comment ça marche</summary>
+    <div class="help-body">
+      <p><strong>1. Convertir.</strong> Déposez un ou plusieurs fichiers (jusqu'à 20), puis
+        « Convertir ». Chaque fichier produit une carte avec son Markdown.
+        <em>Mode</em> : <strong>Auto</strong> (OCR automatique si PDF/image scanné),
+        <strong>Sans OCR</strong> (rapide), <strong>Forcer l'OCR</strong>.</p>
+
+      <p><strong>2. Optimiser (réduire les tokens).</strong> Dans chaque carte, le tableau propose des niveaux :</p>
+      <ul>
+        <li><strong>Brut</strong> — le Markdown d'origine.</li>
+        <li><strong>Nettoyage</strong> — retire le superflu (en-têtes répétés, n° de page, césures PDF). <em>Sans perte, instantané.</em></li>
+        <li><strong>Condensé / Synthèse</strong> — résumé par l'IA locale. <em>Avec perte assumée</em>, mais fort gain de tokens.</li>
+      </ul>
+
+      <p><strong>Le « ~ » est une estimation.</strong> Les lignes Condensé/Synthèse affichent d'abord une
+        estimation de gain. Cliquez <strong>« Calculer »</strong> pour générer réellement cette version
+        (~1 min sur l'IA locale). Une fois calculée, la ligne devient <strong>sélectionnable</strong>
+        (bouton rond à gauche) et le bouton <strong>« Télécharger .md »</strong> vous donne le niveau coché.</p>
+
+      <p><strong>Budget cible</strong> (optionnel) : saisissez un nombre de tokens → la ligne recommandée
+        (la moins agressive qui rentre dans le budget) est surlignée.</p>
+
+      <p><strong>Contrôle de fidélité.</strong> Après chaque optimisation IA, un badge
+        <strong>« ✓ 14/14 chiffres »</strong> indique combien de <em>valeurs numériques</em> du source
+        (montants, %, années, quantités) ont été conservées. <strong>⚠</strong> signale des valeurs
+        <em>manquantes</em> (perte) ou <em>inédites</em> (ajout possible) — survolez le badge pour le détail.
+        Pour <em>Compactage</em> (censé tout garder), tout écart est un avertissement.</p>
+
+      <p><strong>Fidélité de la conversion (PDF numérique uniquement).</strong> Pour un PDF avec couche
+        texte, un badge <strong>« Conversion ✓ x/y chiffres »</strong> dans l'en-tête indique combien de
+        valeurs du PDF ont été correctement captées par MarkItDown. Sur un <em>scan</em>, ce contrôle est
+        indisponible (il n'existe pas de texte de référence — c'est l'OCR le maillon faible).</p>
+
+      <p class="muted small">Note : les niveaux IA restent limités à des documents de taille raisonnable ;
+        un livre entier relève du RAG (récupération), pas d'un résumé en un seul passage.</p>
+    </div>
+  </details>
+
+  <div id="drop" class="dropzone" tabindex="0" role="button" aria-label="Déposer des fichiers">
+    <p class="drop-hint">Déposez ici, ou <span class="link">parcourez</span></p>
+    <input id="fileInput" type="file" multiple hidden>
+  </div>
+
+  <ul id="queue" class="queue"></ul>
+
+  <div class="options">
+    <label class="opt">
+      <span>Mode conversion</span>
+      <select id="mode">
+        <option value="auto">Auto (OCR si PDF/image scanné)</option>
+        <option value="plain">Sans OCR (rapide)</option>
+        <option value="ocr">Forcer l'OCR (fra+eng)</option>
+      </select>
+    </label>
+    <button id="go" type="button" disabled>Convertir</button>
+    <button id="clearQueue" type="button" class="btn-ghost" hidden>Vider la file</button>
+    <span id="status" class="muted small"></span>
+  </div>
+
+  <p class="muted small formats">Formats : {{ allowed }}</p>
+
+  <div id="resultsBar" class="results-bar" hidden>
+    <span class="muted small" id="resultsCount"></span>
+    <button id="clearResults" type="button" class="btn-ghost">Effacer les résultats</button>
+  </div>
+  <div id="results" class="results"
+       data-levels="{{ levels_json }}"
+       data-llm="{{ 1 if llm_enabled else 0 }}"
+       data-maxinput="{{ llm_max_input }}"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/app.js?v={{ asset_ver }}"></script>
+{% endblock %}
